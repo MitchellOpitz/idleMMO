@@ -8,12 +8,11 @@ let Game = {
 
     addHero( hero ) {
       this._heroList.push( hero );
-      // console.log( this._heroList );
     },
 }
 
 let Money = {
-  _currentTotal: 50000,
+  _currentTotal: 500000,
   _htmlTag: "playerMoney",
 
   // Methods
@@ -37,20 +36,22 @@ class Hero {
     this._idNumber = Game.getHeroCount() + 1;
     this._name = "Hero #" + this._idNumber;
     this._level = 1;
+    this._damage = 5;
+    this._experience = 0;
   }
 
   // Getter Methods
-  get name() {
-    return this._name;
-  }
+    get name() {
+      return this._name;
+    }
 
-  get id() {
-    return this._idNumber;
-  }
+    get id() {
+      return this._idNumber;
+    }
 
-  get level() {
-    return this._level;
-  }
+    get level() {
+      return this._level;
+    }
 
   // Public Methods
     static getHeroCost() {
@@ -71,4 +72,56 @@ class Hero {
 
     }
 
+    attack( enemy ) {
+      // Damage formula
+        // Effected by items and base damage.
+      enemy.takeDamage( this._damage, this );
+    }
+
+    gainExperience( amount ) {
+      this._experience += amount;
+
+      // Level-Up
+      if ( this._experience >= this._xpToLevel( this._level + 1 ) ) {
+        this._level++;
+        View.updateText( "hero-" + this.id + "-level", "Level: " + this.level );
+      }
+    }
+
+  // Private Methods
+    _xpToLevel( level ) {
+      return ( 2 * Math.pow( level, 3 ) );
+    }
+
+}
+
+class Enemy {
+  constructor () {
+    this._idNumber = Game.getHeroCount();
+    this._name = "Enemy #" + this._idNumber;
+    this._health = 10;
+    this._goldDrop = 5;
+    this._experienceDrop = 25;
+  }
+
+  // Public Methods
+    static spawn() {
+      let enemy = new Enemy();
+      // Initialize any enemy stats
+      return enemy;
+    }
+
+    takeDamage( damage, hero ) {
+      this._health -= damage;
+
+      // Enemy slain
+      if ( this._health <= 0 ) {
+        Money.gainMoney( this._goldDrop );
+        hero.gainExperience( this._experienceDrop );
+
+        // Resets health.  For dev testing only.
+        console.log( "Enemy slain!" );
+        this._health = 10;
+      }
+    }
 }
