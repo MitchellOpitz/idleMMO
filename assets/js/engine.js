@@ -1,5 +1,8 @@
 let Game = {
   _heroList: [],
+  _enemyList: [],
+  _currentHero: "",
+  _currentEnemy: "",
 
   // Methods
     getHeroCount() {
@@ -9,6 +12,34 @@ let Game = {
     addHero( hero ) {
       this._heroList.push( hero );
     },
+
+    addEnemy( enemy ) {
+      this._enemyList[ enemy.id - 1 ] = enemy;
+    },
+
+    getHero( idNumber ) {
+      return this._heroList[ idNumber ];
+    },
+
+    getEnemy( idNumber ) {
+      return this._enemyList[ idNumber ];
+    },
+
+    setCurrentHero( hero ) {
+      this._currentHero = hero;
+    },
+
+    getCurrentHero() {
+      return this._currentHero;
+    },
+
+    setCurrentEnemy( enemy ) {
+      this._currentEnemy = enemy;
+    },
+
+    getCurrentEnemy() {
+      return this._currentEnemy;
+    }
 }
 
 let Money = {
@@ -85,6 +116,10 @@ class Hero {
       if ( this._experience >= this._xpToLevel( this._level + 1 ) ) {
         this._level++;
         View.updateText( "hero-" + this.id + "-level", "Level: " + this.level );
+        let currentHero = Game.getCurrentHero();
+        if( this.id == currentHero.id ) {
+          View.updateText( "activeHero-level", "Level: " + this._level );
+        }
       }
     }
 
@@ -104,15 +139,31 @@ class Enemy {
     this._experienceDrop = 25;
   }
 
+  // Getter Methods
+    get id() {
+      return this._idNumber;
+    }
+    get name() {
+      return this._name;
+    }
+    get health() {
+      return this._health;
+    }
+
   // Public Methods
     static spawn() {
       let enemy = new Enemy();
       // Initialize any enemy stats
+      Game.addEnemy( enemy );
       return enemy;
     }
 
     takeDamage( damage, hero ) {
       this._health -= damage;
+      let currentEnemy = Game.getCurrentEnemy();
+      if( this.id == currentEnemy.id ) {
+        View.updateText( "activeEnemy-health", "Health: " + this._health );
+      }
 
       // Enemy slain
       if ( this._health <= 0 ) {
@@ -120,8 +171,11 @@ class Enemy {
         hero.gainExperience( this._experienceDrop );
 
         // Resets health.  For dev testing only.
-        console.log( "Enemy slain!" );
         this._health = 10;
+        let currentEnemy = Game.getCurrentEnemy();
+        if( this.id == currentEnemy.id ) {
+          View.updateText( "activeEnemy-health", "Health: " + this._health );
+        }
       }
     }
 }

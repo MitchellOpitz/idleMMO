@@ -11,6 +11,8 @@ let View = {
 	    // <section id="hero-[idNumber]">
 	    let heroBlock = document.createElement("section");
 	    heroBlock.setAttribute("id", ID );
+	    heroBlock.setAttribute("class", "heroBlock" );
+    	heroBlock.setAttribute("onclick", "Controller.activateHero(" + hero.id + ")");
 
 	    	// <h3 id="hero-1-name">Name</h3>
 	    	heroBlock.appendChild(
@@ -34,6 +36,16 @@ let View = {
 		}
 	    tagBlock.innerHTML = value;
 	    return tagBlock;
+	},
+
+	activateHero( hero ) {
+		View.updateText( "activeHero-name", hero.name );
+		View.updateText( "activeHero-level", "Level: " + hero.level );
+	},
+
+	activateEnemy( enemy ) {
+		View.updateText( "activeEnemy-name", enemy.name );
+		View.updateText( "activeEnemy-health", "Level: " + enemy.health );
 	}
 
 }
