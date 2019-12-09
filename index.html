@@ -4,9 +4,9 @@
 		<meta charset="utf-8" />
 		<title>Idle MMO</title>
 		<link rel="stylesheet" type="text/css" href="assets/styles/stylesheet.css">
-		<script src="assets/js/engine.js" defer></script>
 		<script src="assets/js/view.js" defer></script>
 		<script src="assets/js/controller.js" defer></script>
+		<script src="assets/js/engine.js" defer></script>
 	</head>
 	<body>
 		<header>
@@ -14,12 +14,13 @@
 			<p id="heroCost">Next Hero: 0</p>
 			<p id="playerMoney">Money: 0</p>
 		</header>
-		<aside id="heroList">
-		</aside>
 		<article>
+			<aside id="heroList">
+			</aside>
 			<section id="activeHero">
 				<h3 id="activeHero-name"></h3>
 				<p id="activeHero-level"></p>
+				<p id="activeHero-gearLevel"></p>
 			</section>
 			<section id="activeEnemy" onclick="Controller.assistHero()">
 				<h3 id="activeEnemy-name"></h3>

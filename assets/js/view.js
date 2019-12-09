@@ -24,6 +24,11 @@ let View = {
 	    		View.createTagBlock( "p", ID + "-level", "Level: 1" )
 	    		)
 
+	    	// <p id="hero-1-level">Level: X</p>
+	    	heroBlock.appendChild(
+	    		View.createTagBlock( "p", ID + "-gearLevel", "Gear Level: 0" )
+	    		)
+
 	    var heroList = document.getElementById( "heroList" );
 	    heroList.appendChild( heroBlock );
 
@@ -45,7 +50,7 @@ let View = {
 
 	activateEnemy( enemy ) {
 		View.updateText( "activeEnemy-name", enemy.name );
-		View.updateText( "activeEnemy-health", "Level: " + enemy.health );
+		View.updateText( "activeEnemy-health", "Health: " + enemy.health );
 	}
 
 }

@@ -2,16 +2,39 @@
 >>> TABLE OF CONTENTS:
 ----------------------------------------------------------------
 # Global Styles
-    # Header
-    # Hero List
+    ## Header
+    ## Article
+    ### Hero List
+    ### Active Hero
+    ### Active Enemy
 --------------------------------------------------------------*/
 
 /*--------------------------------------------------------------
 # Global Styles
 --------------------------------------------------------------*/
 
-body {
+@import url('https://fonts.googleapis.com/css?family=Bangers|Roboto&display=swap');
+
+body, h3, p {
 	margin: 0;
+}
+
+h3 {
+	font-family: 'Bangers', cursive;
+	font-size: 2rem;
+}
+
+p {
+	font-family: 'Roboto', sans-serif;
+	font-size: 1rem;
+}
+
+*::selection {
+	background: transparent;
+}
+
+*::-moz-selection {
+	background: transparent;
 }
 
 /*--------------------------------------------------------------
@@ -26,12 +49,41 @@ header {
 }
 
 /*--------------------------------------------------------------
-## Hero List
+## Article
+--------------------------------------------------------------*/
+
+article {
+	display: flex;
+	justify-content: space-between;
+}
+
+article > * {
+	width: 30%;
+	text-align: center;
+}
+
+/*--------------------------------------------------------------
+### Hero List
 --------------------------------------------------------------*/
 
 .heroBlock {
 	background-color: black;
 	color: white;
-	width: 200px;
+	margin: 1rem;
+}
+
+/*--------------------------------------------------------------
+### Active Hero
+--------------------------------------------------------------*/
+
+#activeHero {
+	margin: 1rem;
+}
+
+/*--------------------------------------------------------------
+### Active Enemy
+--------------------------------------------------------------*/
+
+#activeEnemy {
 	margin: 1rem;
 }
