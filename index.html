@@ -10,22 +10,78 @@
 	</head>
 	<body>
 		<header>
-			<button id="recruitButton" onclick="Controller.recruit()">Recruit Hero</button>
-			<p id="heroCost">Next Hero: 0</p>
-			<p id="playerMoney">Money: 0</p>
+			<section id="recruitHero">
+				<button id="recruitButton" onclick="Controller.recruit()">Recruit Hero</button>
+				<p id="heroCost">Next Hero: 0</p>
+			</section>
+			<section>
+				<button id="playerUpgradesButton" onclick="View.toggleUpgrades()">Purchase Upgrades</button>
+			</section>
+			<section>
+				<p id="playerMoney">Money: 0</p>
+			</section>
 		</header>
 		<article>
 			<aside id="heroList">
 			</aside>
-			<section id="activeHero">
+			<section id="activeHero" onclick="View.toggleUpgrades('hero')">
 				<h3 id="activeHero-name"></h3>
 				<p id="activeHero-level"></p>
 				<p id="activeHero-gearLevel"></p>
+				<div id="activeHeroXPStatus">
+					<div id="activeHeroExperienceBar" class="animation"></div>
+				</div>
 			</section>
 			<section id="activeEnemy" onclick="Controller.assistHero()">
 				<h3 id="activeEnemy-name"></h3>
 				<p id="activeEnemy-health"></p>
+				<div id="activeEnemyHealthStatus">
+					<div id="activeEnemyHealthBar" class="animation"></div>
+				</div>
 			</section>
 		</article>
+		<footer>
+			<section id="playerUpgrades">
+				<p>Player Upgrades Go Here</p>
+			</section>
+			<section id="heroUpgrades">
+				<div id="activeHero-Head" onclick="Controller.upgradeGear( 'Head' )">
+					<h3>Head</h3>
+					<p id="activeHero-Head-stats">None</p>
+				</div>
+				<div id="activeHero-Shoulders" onclick="Controller.upgradeGear( 'Shoulders' )">
+					<h3>Shoulders</h3>
+					<p id="activeHero-Shoulders-stats">None</p>
+				</div>
+				<div id="activeHero-Chest" onclick="Controller.upgradeGear( 'Chest' )">
+					<h3>Chest</h3>
+					<p id="activeHero-Chest-stats">None</p>
+				</div>
+				<div id="activeHero-Legs" onclick="Controller.upgradeGear( 'Legs' )">
+					<h3>Legs</h3>
+					<p id="activeHero-Legs-stats">None</p>
+				</div>
+				<div id="activeHero-Belt" onclick="Controller.upgradeGear( 'Belt' )">
+					<h3>Belt</h3>
+					<p id="activeHero-Belt-stats">None</p>
+				</div>
+				<div id="activeHero-Feet" onclick="Controller.upgradeGear( 'Feet' )">
+					<h3>Feet</h3>
+					<p id="activeHero-Feet-stats">None</p>
+				</div>
+				<div id="activeHero-Hands" onclick="Controller.upgradeGear( 'Hands' )">
+					<h3>Hands</h3>
+					<p id="activeHero-Hands-stats">None</p>
+				</div>
+				<div id="activeHero-Back" onclick="Controller.upgradeGear( 'Back' )">
+					<h3>Back</h3>
+					<p id="activeHero-Back-stats">None</p>
+				</div>
+				<div id="activeHero-Weapon" onclick="Controller.upgradeGear( 'Weapon' )">
+					<h3>Weapon</h3>
+					<p id="activeHero-Weapon-stats">None</p>
+				</div>
+			</section>
+		</footer>
 	</body>
 </html>

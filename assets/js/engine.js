@@ -4,10 +4,15 @@ let Game = {
   _currentHero: "",
   _currentEnemy: "",
   _expansions: 0,
+  _maxHeroes: 25,
 
   // Getter Method
     get heroCount() {
       return this._heroList.length;
+    },
+
+    get maxHeroes() {
+      return this._maxHeroes;
     },
 
     set activeHero( hero ) {
@@ -30,6 +35,11 @@ let Game = {
       return ( ( this._expansions * 10 ) + 20 );
     },
 
+    get recommendedGearLevel() {
+      return ( Game.levelCap * 191.25 );
+      // levelCap * 9 gear slots * 25 heroes * .85 (85% epic'd)
+    },
+
   // Methods
     addHero( hero ) {
       this._heroList.push( hero );
@@ -48,15 +58,59 @@ let Game = {
     },
 
     save() {
-      localStorage.clear();
-      localStorage.setItem( 'money', JSON.stringify( Money.total ) );
+      // localStorage.clear();
+      let gameSave = [];
+      gameSave.push( Money.total );
+      //localStorage.setItem( 'money', JSON.stringify( Money.total ) );
+      for ( let i = 0; i < Game.heroCount; i++ ) {
+        let hero = Game.getHero(i);
+        gameSave.push( hero );
+      }
+      localStorage.setItem( 'gameSave', JSON.stringify( gameSave ) );
     },
 
     load() {
-      // Money
-      let moneySave = JSON.parse( localStorage.getItem( 'money' ) );
-      Money.gainMoney( moneySave );
+      //localStorage.clear();
+      let gameSave = JSON.parse( localStorage.getItem( 'gameSave' ) );
+
+      if ( gameSave !== null ) {
+        for ( let i = 1; i <= gameSave.length - 1; i++ ) {
+
+          // Hero
+          let hero = new Hero();
+          let heroSave = gameSave[i];
+          hero._id = heroSave._idNumber;
+          hero._level = heroSave._level;
+          hero._damage = heroSave._damage;
+          hero._experience = heroSave._experience;
+          let items = heroSave._items;
+          hero._attackSpeed = heroSave._attackSpeed;
+          View.displayNewHero( hero );
+          View.updateText( "hero-" + hero.id + "-level", "Level: " + hero.level );
+          View.activateHero( hero );
+          //View.showHeroGear();
+          Game.addHero( hero );
+
+          // Items
+          for ( let j = 0; j < items.length; j++ ) {
+            let item = new Item();
+            item._rarity = heroSave._items[j]._rarity;
+            item._slot = heroSave._items[j]._slot;
+            item._stats = heroSave._items[j]._stats;
+            item._level = heroSave._items[j]._level;
+            hero.acquireItem( item );
+          }
+
+          let enemy = Enemy.spawn();
+          View.activateEnemy( enemy );
+          hero.autoAttack( enemy );
+        }
+        // Money
+        let moneySave = gameSave[0];
+        Money.gainMoney( moneySave );
+      }
     }
+      
 }
 
 let Money = {
@@ -91,6 +145,8 @@ class Hero {
     this._experience = 0;
     this._items = [];
     this._gearLevel = 0;
+    this._attackSpeed = 1000;
+    this._autoAttack;
   }
 
   // Getter Methods
@@ -106,12 +162,37 @@ class Hero {
       return this._level;
     }
 
+    get gearLevel() {
+      return this._gearLevel;
+    }
+
+    get items() {
+      return this._items;
+    }
+
+    get damage() {
+      return this._damage;
+    }
+
+    get experience() {
+      return this._experience;
+    }
+
+    get attackSpeed() {
+      return this._attackSpeed;
+    }
+
     static get cost() {
       return Game.heroCount * 2500;
     }
 
   // Public Methods
     static recruit() {
+
+      if ( Game.heroCount == Game.maxHeroes ) {
+        View.updateText( "heroCost", "Max Heroes Reached" );
+        return false;
+      }
 
       if ( Money.total >= Hero.cost ) {
         Money.spendMoney( Hero.cost );
@@ -126,6 +207,14 @@ class Hero {
 
     }
 
+    autoAttack( enemy ) {
+      let hero = this;
+      clearInterval( this._autoAttack );
+      this._autoAttack = window.setInterval(function() {
+        hero.attack( enemy );
+      }, this._attackSpeed );
+    }
+
     attack( enemy ) {
       let damage = this._damage + this._gearLevel;
 
@@ -138,6 +227,11 @@ class Hero {
       if ( this._level < Game.levelCap ) {
         this._experience += amount;
 
+          // Update active hero.
+          if( this.id == Game.activeHero.id ) {
+            View.updateHeroExperienceBar( this._experience, this );
+          }
+
         // Level-Up
         if ( this._experience >= this._xpToLevel( this._level + 1 ) ) {
           this._level++;
@@ -148,6 +242,7 @@ class Hero {
           // Update active hero.
           if( this.id == Game.activeHero.id ) {
             View.updateText( "activeHero-level", "Level: " + this._level );
+            View.updateHeroExperienceBar( this._experience, this );
           }
           
         }
@@ -167,7 +262,6 @@ class Hero {
                 if ( item._stats > this._items[i]._stats ) {
                     this._items[i] = ( item );
                     this._gearLevel = this._updateGearLevel();
-                    console.log( this._items );
                 }
                 return;
             }
@@ -175,7 +269,7 @@ class Hero {
 
         this._items.push( item );
         this._gearLevel = this._updateGearLevel();
-                    console.log( this._items );
+        View.showHeroGear();
     }
 
   // Private Methods
@@ -193,7 +287,8 @@ class Hero {
       // Update text
       View.updateText( "hero-" + this.id + "-gearLevel", "Gear Level: " + level );
       if ( this._idNumber == Game.activeHero.id ) {  
-          View.updateText( "activeHero-gearLevel", "Gear Level: " + level );                
+          View.updateText( "activeHero-gearLevel", "Gear Level: " + level );
+          View.showHeroGear();            
       }
       return level;
     }
@@ -206,6 +301,7 @@ class Enemy {
     this._name = "Enemy #" + this._idNumber;
     this._level = Game.getHero( this._idNumber - 1 ).level;
     this._health = this._level*2 + this._level**2;
+    this._maxHealth = this._level*2 + this._level**2;
     this._goldDrop = this._level**2;
     this._experienceDrop = this._level*2;
   }
@@ -236,6 +332,7 @@ class Enemy {
       this._health -= damage;
       if( this.id == Game.activeEnemy.id ) {
         View.updateText( "activeEnemy-health", "Health: " + this._health );
+        View.updateEnemyHealthBar( this._health, this._maxHealth );
       }
 
       // Enemy slain
@@ -249,11 +346,13 @@ class Enemy {
 
         // Resets health.  For dev testing only.
         this._level = Game.getHero( this._idNumber - 1 ).level;
-        this._health = this._level*2 + this._level**2;
+        this._health = this._level*2 + this._level**2;        
+        this._maxHealth = this._level*2 + this._level**2;
         this._goldDrop = this._level**2;
         this._experienceDrop = this._level*2;
         if( this.id == Game.activeEnemy.id ) {
           View.updateText( "activeEnemy-health", "Health: " + this._health );
+          View.updateEnemyHealthBar( this._health, this._maxHealth );
         }
       }
     }
@@ -269,6 +368,19 @@ class Item {
         this._level;  // Done
         this._sellValue;
     }
+
+    // Getter Methods
+      get slot() {
+        return this._slot;
+      }
+
+      get rarity() {
+        return this._rarity;
+      }
+
+      get stats() {
+        return this._stats;
+      }
 
     // Public Methods
         static roll( level ) {
@@ -338,6 +450,9 @@ class Item {
             item.slotRoll();
             item.getStats( rarity );
             return item;
+        }
+
+        static upgrade( slot, level ) {
         }
 }
 
